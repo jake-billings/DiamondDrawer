@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JPanel;
 
 public class GUI {
 
@@ -16,27 +17,34 @@ public class GUI {
 		GUI gui = new GUI();
 		gui.go();
 	}
-	
+
 	private JFrame frame;
 	private JTextArea console;
 	private JScrollPane consoleScroller;
 	private JButton button;
 	private JLabel diamondNumberLabel;
 	private long diamonds = 0;
-	
+	private long allDiamonds = 0;
+	private double diamondsPerSecond = 0;
+	private double diamondsPerSecondOverflow = 0;
+	private JPanel sidebar;
+	private JButton btnBuyScribe;
+
+	private Thread updateDiamondThread;
+
 	public GUI() {
 		frame = new JFrame("Diamond Drawer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(0,0,500,500);
-		
+
 		diamondNumberLabel=new JLabel();
-		frame.add(diamondNumberLabel,BorderLayout.NORTH);
-		
+		frame.getContentPane().add(diamondNumberLabel,BorderLayout.NORTH);
+
 		console = new JTextArea();
 		console.setEditable(false);
-		
+
 		consoleScroller = new JScrollPane(console);
-		
+
 		button = new JButton("Go!");
 		button.addActionListener(new ActionListener() {
 
@@ -44,39 +52,72 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				drawDiamond();			
 			}
-			
+
 		});
-		
-		frame.add(consoleScroller,BorderLayout.CENTER);
-		frame.add(button,BorderLayout.SOUTH);
+
+		sidebar = new JPanel();
+		frame.getContentPane().add(sidebar, BorderLayout.WEST);
+
+		btnBuyScribe = new JButton("Buy Scribe (100)");
+		btnBuyScribe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (diamonds>=100) {
+					diamondsPerSecond+=1;
+					diamonds-=100;
+				}
+			}
+		});
+		sidebar.add(btnBuyScribe);
+
+		frame.getContentPane().add(consoleScroller,BorderLayout.CENTER);
+		frame.getContentPane().add(button,BorderLayout.SOUTH);
+
+		updateDiamondThread = new Thread() {
+			public void run() {
+				try {
+					while (true) {
+						diamondsPerSecondOverflow+=diamondsPerSecond;
+						while(diamondsPerSecondOverflow>=1) {
+							drawDiamond();
+							diamondsPerSecondOverflow--;
+						}
+						Thread.sleep(1000);
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		};
 	}
-	
+
 	public void drawDiamond() {
 		diamonds++;
-		logln("=Diamond "+ (diamonds) + "=");
+		allDiamonds++;
+		logln("=Diamond "+ (allDiamonds) + "=");
 		logln("   /\\   ");
 		logln("  /  \\  ");
 		logln(" /    \\ ");
 		logln(" \\    /  ");
 		logln("  \\  /   ");
 		logln("   \\/   ");
-		diamondNumberLabel.setText("Diamonds: 0"+diamonds);
+		diamondNumberLabel.setText("Diamonds: "+diamonds);
 	}
-	
+
 	public void scrollToBottom() {
 		consoleScroller.getVerticalScrollBar().setValue(consoleScroller.getVerticalScrollBar().getMaximum());
 	}
-	
+
 	public void log(String str) {
 		console.setText(console.getText()+str);
 		scrollToBottom();
 	}
-	
+
 	public void logln(String str) {
 		log(str+"\n");
 	}
 
 	public void go() {
 		frame.setVisible(true);
+		updateDiamondThread.run();
 	}
 }
