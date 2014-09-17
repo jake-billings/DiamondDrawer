@@ -1,15 +1,16 @@
 package org.stemhigh.apcs.billings.science;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JPanel;
 
 public class GUI {
 
@@ -55,15 +56,37 @@ public class GUI {
 
 		});
 
-		sidebar = new JPanel();
+		sidebar = new JPanel(new GridLayout(5,1));
 		frame.getContentPane().add(sidebar, BorderLayout.WEST);
 
-		btnBuyScribe = new JButton("Buy Scribe (100)");
+		btnBuyScribe = new JButton("Buy Servent (50)");
 		btnBuyScribe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (diamonds>=100) {
-					diamondsPerSecond+=1;
-					diamonds-=100;
+				if (diamonds>=50) {
+					diamondsPerSecond+=5;
+					diamonds-=50;
+				}
+			}
+		});
+		sidebar.add(btnBuyScribe);
+
+		btnBuyScribe = new JButton("Buy Scribe (500)");
+		btnBuyScribe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (diamonds>=500) {
+					diamondsPerSecond+=50;
+					diamonds-=500;
+				}
+			}
+		});
+		sidebar.add(btnBuyScribe);
+
+		btnBuyScribe = new JButton("Buy Author (5000)");
+		btnBuyScribe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (diamonds>=5000) {
+					diamondsPerSecond+=500;
+					diamonds-=5000;
 				}
 			}
 		});
